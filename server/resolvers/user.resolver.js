@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 
-import { dummyUsers } from "../data/index.js";
 import User from "../models/user.model.js";
 
 const userResolver = {
@@ -81,7 +80,7 @@ const userResolver = {
         throw new Error(error.message || "Error in getting user");
       }
     },
-    // TODO => ADD USER/TRANSACTION RELATION
+    // TODO: => ADD USER/TRANSACTION RELATION
   },
 };
 
