@@ -34,14 +34,54 @@ const userResolver = {
         throw new Error(error.message || "Internal server error");
       }
     },
+    login: async (_, { input }, context) => {
+      try {
+        const { username, password } = input;
+        const { user } = await context.authenticate("graphql-local", {
+          username,
+          password,
+        });
+        await context.login(user);
+        return user;
+      } catch (error) {
+        console.error("Error in login: ", error);
+        throw new Error(error.message || "Internal server erro");
+      }
+    },
+    logout: async (_, _, context) => {
+      try {
+        await context.logout();
+        req.session.destroy((err) => {
+          if (err) throw err;
+        });
+        res.clearCookie("connect.sid");
+        return { message: "Logout successfully" };
+      } catch (error) {
+        console.error("Error in logout: ", error);
+        throw new Error(error.message || "Internal server erro");
+      }
+    },
   },
   Query: {
-    users: (_, _, { req, res }) => {
-      return dummyUsers;
+    authUser: async (_, _, context) => {
+      try {
+        const user = await context.getUser();
+        return user;
+      } catch (error) {
+        console.error("Error in authUser: ", error);
+        throw new Error(error.message || "Internal server erro");
+      }
     },
-    user: (_, { userId }, { req, res }) => {
-      return dummyUsers.find((user) => user._id === userId);
+    user: async (_, { userId }) => {
+      try {
+        const user = await User.findById(userId);
+        return user;
+      } catch (error) {
+        console.error("Error in user query: ", error);
+        throw new Error(error.message || "Error in getting user");
+      }
     },
+    // TODO => ADD USER/TRANSACTION RELATION
   },
 };
 
